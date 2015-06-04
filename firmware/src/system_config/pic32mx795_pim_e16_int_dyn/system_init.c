@@ -501,11 +501,53 @@ void SYS_Initialize ( void* data )
     APP_Initialize();
 
 
-    // Initialize LEDs
+    // Set up OC ports for the PWM
+    ANSELBbits.ANSB15 = 0; // 0 for digital, 1 for analog
+    //For a peripheral that requires an output pin, use the RP(pin name)Rbits.RP(pin name)R to set the pin, using table 12-2 in Chapter 12
+    RPB15Rbits.RPB15R = 0b0101; // set B15 to U1TX
 
-    ANSELBbits.ANSB15 = 0;
-    TRISBbits.TRISB15 = 0;
+    TRISBbits.TRISB8 = 0;
+    RPB8Rbits.RPB8R = 0b0101;
+
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    // Set Digital Pins to control H-Bridge Orientation
+    ANSELBbits.ANSB13 = 0; // 0 for digital, 1 for analog
+    TRISBbits.TRISB13 = 0;
+    PORTBbits.RB13 = 1;
+
+
+    // set up LED1 pin as a digital output
+    RPB7Rbits.RPB7R = 0b0001; // set B7 to U1TX
     TRISBbits.TRISB7 = 0;
+    PORTBbits.RB7 = 0;
+
+    //////////////////////////// Initialize timers ////////////////////////////
+
+    T2CONbits.TCKPS = 1;     // Timer2 prescaler = 2
+    PR2 = 19999;              // ClockFrequency / PreScaler / Period = frequency in Hz
+    TMR2 = 0;                // initial TMR2 count is 0
+    OC1CONbits.OCM = 0b110;  // PWM mode without fault pin; other OC1CON bits are defaults
+    OC1CONbits.OCTSEL = 0;   // set Output compare timer select bit to use timer 2 as clock source
+    OC1RS = 20000;               // duty cycle = OC1RS/(PR2+1) = 75%
+    OC1R = 0;                // initialize before turning OC1 on; afterward it is read-only
+    T2CONbits.ON = 1;        // turn on Timer2
+    OC1CONbits.ON = 1;       // turn on OC1
+
+    T3CONbits.TCKPS = 1;     // Timer3 prescaler = 2
+    PR3 = 19999;              // ClockFrequency / PreScaler / Period = frequency in Hz
+    TMR3 = 0;                // initial TMR3 count is 0
+    OC2CONbits.OCM = 0b110;  // PWM mode without fault pin; other OC2CON bits are defaults
+    OC2CONbits.OCTSEL = 0;   // set Output compare timer select bit to use timer 2 as clock source
+    OC2RS = 20000;               // duty cycle = OC2RS/(PR2+1) = 75%
+    OC2R = 0;                // initialize before turning OC2 on; afterward it is read-only
+    T3CONbits.ON = 1;        // turn on Timer3
+    OC2CONbits.ON = 1;       // turn on OC2
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    //ANSELBbits.ANSB15=0;
+    //TRISBbits.TRISB15=0;
 }
 
 /*******************************************************************************

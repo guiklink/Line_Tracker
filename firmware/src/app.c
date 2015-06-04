@@ -204,6 +204,7 @@ USB_DEVICE_CDC_EVENT_RESPONSE APP_USBDeviceCDCEventHandler
 void APP_USBDeviceEventHandler ( USB_DEVICE_EVENT event, void * eventData, uintptr_t context)
 {
     uint8_t configurationValue;
+
     switch ( event )
     {
         case USB_DEVICE_EVENT_RESET:
@@ -380,7 +381,7 @@ void APP_Tasks ( void )
     /* Update the application state machine based
      * on the current state */
     USB_DEVICE_CDC_RESULT writeRequestResult;
-
+    int value_COM;
 
     switch(appData.state)
     {
@@ -438,6 +439,17 @@ void APP_Tasks ( void )
                 appData.isReadComplete = false;
                 USB_DEVICE_CDC_Read (appData.cdcInstance, &appData.readTransferHandle,
                         appData.readBuffer, 64);
+
+                 //value_COM = atappData.readBuffer[0]);
+
+                 //rxbuffer[rxbuffer_index] = appData.readBuffer[0];
+
+                strcpy(rxbuffer,appData.readBuffer);
+
+                int com;
+                sscanf(rxbuffer,"%d",&com);
+
+               
                 //DRV_USART_Write(appData.usartHandle, appData.readBuffer, appData.readLength);
                 /*if(appData.readBuffer[0]=='a')
                 {
@@ -445,30 +457,33 @@ void APP_Tasks ( void )
                 }*/
                 // messages come in one char at a time
                 // if the char is a newline, then the message is complete
-                if(appData.readBuffer[0]=='\n'||appData.readBuffer[0]=='\r'){
-                    int num1, num2;
-                    sscanf(rxbuffer,"%d %d",&num1,&num2);
+
+                
+                /*if(appData.readBuffer[0]=='\n'||appData.readBuffer[0]=='\r'){
+                //if(appData.readBuffer[0]=='#' || appData.readBuffer[0]=='0'){
+                    LATBINV = 0x8000;
+                    int num1;
+                    sscanf(rxbuffer,"%d",&num1);
                     //rxbuffer[rxbuffer_index] = '\0';
                     rxbuffer_index = 0;
-                    /*char ref[10]={'t','e','s','t'};
-                    strcpy(message, rxbuffer);
+                    sprintf(message,"%d",num1);
                     int len = 0;
                     while(message[len]>0){
-                    len++;
+                        len++;
                     }
-                    writeRequestResult = USB_DEVICE_CDC_Write(0, &appData.writeTransferHandle, message, len, USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);*/
+                    writeRequestResult = USB_DEVICE_CDC_Write(0, &appData.writeTransferHandle, message, len, USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
                 // now use num1 and num2 for whatever
                 }
                 // otherwise put the char in a buffer and increment the index
                 else {
+                    //LATBINV = 0x8000;
                     rxbuffer[rxbuffer_index] = appData.readBuffer[0];
                     rxbuffer_index++;
                     // watch out for running over the buffer
                     if(rxbuffer_index == MAX_BUFFER){
-                    rxbuffer_index = 0;
-                    TRISBINV = 0x80;
+                        rxbuffer_index = 0;
                     }
-                }
+                }*/
             }
 
             appData.state = APP_STATE_CHECK_UART_RECEIVE;
@@ -492,7 +507,7 @@ void APP_Tasks ( void )
                         USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
 
             }*/
-            message[0]='a';
+            //message[0]= value_COM;
             int len = 0;
             while(message[len]>0){
                 len++;
@@ -517,7 +532,54 @@ void APP_Tasks ( void )
             break;
     }
 }
- 
+
+#define MIDDLE 322
+#define SCALE 15
+
+int get_ocrs(int dutyCycle)
+{
+    int r,c;
+    c = dutyCycle;
+    if(c>100)
+        c=100;
+    if(c<0)
+        c=0;
+    r=(c/100)*20000;
+    return r;
+}
+
+
+void controlWheels(int value)
+{
+    int contr;
+    int sideTurn; // Left = 1 | Right = 2
+
+    OC1RS = 13000;
+    OC2RS = 13000;
+
+    contr = MIDDLE - value;
+
+    if(contr < 0)
+        sideTurn = 2;
+    else
+    {
+        sideTurn = 1;
+        contr *= -1;
+    }
+
+    int effort;
+
+    effort = contr * SCALE;
+
+    if(sideTurn == 1)
+    {
+        OC2RS = get_ocrs(100-effort);
+    }
+    if(sideTurn == 2)
+    {
+        OC1RS = get_ocrs(100-effort);
+    }
+}
 
 /*******************************************************************************
  End of File
