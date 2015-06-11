@@ -50,6 +50,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "app.h"
+#include "i2c_display.h"
 
 
 // ****************************************************************************
@@ -500,7 +501,7 @@ void SYS_Initialize ( void* data )
     /* Initialize the Application */
     APP_Initialize();
 
-
+    /*
     // Set up OC ports for the PWM
     ANSELBbits.ANSB15 = 0; // 0 for digital, 1 for analog
     //For a peripheral that requires an output pin, use the RP(pin name)Rbits.RP(pin name)R to set the pin, using table 12-2 in Chapter 12
@@ -508,9 +509,9 @@ void SYS_Initialize ( void* data )
 
     TRISBbits.TRISB8 = 0;
     RPB8Rbits.RPB8R = 0b0101;
-
+    */
     ///////////////////////////////////////////////////////////////////////////////////
-
+    /*
     // Set Digital Pins to control H-Bridge Orientation
     ANSELBbits.ANSB13 = 0; // 0 for digital, 1 for analog
     TRISBbits.TRISB13 = 0;
@@ -521,9 +522,9 @@ void SYS_Initialize ( void* data )
     RPB7Rbits.RPB7R = 0b0001; // set B7 to U1TX
     TRISBbits.TRISB7 = 0;
     PORTBbits.RB7 = 0;
-
+    */
     //////////////////////////// Initialize timers ////////////////////////////
-
+    /*
     T2CONbits.TCKPS = 1;     // Timer2 prescaler = 2
     PR2 = 19999;              // ClockFrequency / PreScaler / Period = frequency in Hz
     TMR2 = 0;                // initial TMR2 count is 0
@@ -543,11 +544,13 @@ void SYS_Initialize ( void* data )
     OC2R = 0;                // initialize before turning OC2 on; afterward it is read-only
     T3CONbits.ON = 1;        // turn on Timer3
     OC2CONbits.ON = 1;       // turn on OC2
-
+    */
     ///////////////////////////////////////////////////////////////////////////
 
     //ANSELBbits.ANSB15=0;
     //TRISBbits.TRISB15=0;
+
+    display_init();
 }
 
 /*******************************************************************************

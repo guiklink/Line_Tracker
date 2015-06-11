@@ -263,4 +263,5 @@ build/pic32mx795_pim_e16_int_dyn/production/_ext/1856320864/system_init.o:  \
  ../../../../../../framework/usb/usb_device_cdc.h  \
  ../../../../../../framework/usb/usb_cdc.h  \
 ../src/app.h  \
- ../src/system_config/pic32mx795_pim_e16_int_dyn/system_definitions.h 
+ ../src/system_config/pic32mx795_pim_e16_int_dyn/system_definitions.h  \
+ ../src/i2c_display.h 
