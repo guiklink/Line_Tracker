@@ -535,6 +535,7 @@ void APP_Tasks ( void )
 
 #define MIDDLE 322
 #define SCALE 15
+#define MAX_SPEED 17000
 
 int get_ocrs(int dutyCycle)
 {
@@ -554,9 +555,6 @@ void controlWheels(int value)
     int contr;
     int sideTurn; // Left = 1 | Right = 2
 
-    OC1RS = 13000;
-    OC2RS = 13000;
-
     contr = MIDDLE - value;
 
     if(contr < 0)
@@ -574,10 +572,12 @@ void controlWheels(int value)
     if(sideTurn == 1)
     {
         OC2RS = get_ocrs(100-effort);
+        OC1RS = MAX_SPEED;
     }
     if(sideTurn == 2)
     {
         OC1RS = get_ocrs(100-effort);
+        OC2RS = MAX_SPEED;
     }
 }
 
